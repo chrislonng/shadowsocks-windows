@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using Shadowsocks.Controller;
-using Shadowsocks.Util;
+using Shadowsocks.Util.Sockets;
 
 namespace Shadowsocks.Proxy
 {
@@ -41,7 +39,7 @@ namespace Shadowsocks.Proxy
             public Exception ex { get; set; }
         }
 
-        private Socket _remote;
+        private readonly WrappedSocket _remote = new WrappedSocket();
 
         private const int Socks5PktMaxSize = 4 + 16 + 2;
         private readonly byte[] _receiveBuffer = new byte[Socks5PktMaxSize];
@@ -58,7 +56,7 @@ namespace Shadowsocks.Proxy
 
             ProxyEndPoint = remoteEP;
 
-            SocketUtil.BeginConnectTcp(remoteEP, ConnectCallback, st);
+            _remote.BeginConnect(remoteEP, ConnectCallback, st);
         }
 
         public void EndConnectProxy(IAsyncResult asyncResult)
@@ -126,7 +124,7 @@ namespace Shadowsocks.Proxy
             st.Callback = callback;
             st.AsyncState = state;
 
-            _remote?.BeginSend(request, 0, request.Length, 0, Socks5RequestSendCallback, st);
+            _remote.BeginSend(request, 0, request.Length, 0, Socks5RequestSendCallback, st);
         }
 
         public void EndConnectDest(IAsyncResult asyncResult)
@@ -142,7 +140,7 @@ namespace Shadowsocks.Proxy
         public void BeginSend(byte[] buffer, int offset, int size, SocketFlags socketFlags, AsyncCallback callback,
             object state)
         {
-            _remote?.BeginSend(buffer, offset, size, socketFlags, callback, state);
+            _remote.BeginSend(buffer, offset, size, socketFlags, callback, state);
         }
 
         public int EndSend(IAsyncResult asyncResult)
@@ -153,7 +151,7 @@ namespace Shadowsocks.Proxy
         public void BeginReceive(byte[] buffer, int offset, int size, SocketFlags socketFlags, AsyncCallback callback,
             object state)
         {
-            _remote?.BeginReceive(buffer, offset, size, socketFlags, callback, state);
+            _remote.BeginReceive(buffer, offset, size, socketFlags, callback, state);
         }
 
         public int EndReceive(IAsyncResult asyncResult)
@@ -163,12 +161,12 @@ namespace Shadowsocks.Proxy
 
         public void Shutdown(SocketShutdown how)
         {
-            _remote?.Shutdown(how);
+            _remote.Shutdown(how);
         }
 
         public void Close()
         {
-            _remote?.Close();
+            _remote.Dispose();
         }
         
 
@@ -177,7 +175,9 @@ namespace Shadowsocks.Proxy
             var state = (Socks5State) ar.AsyncState;
             try
             {
-                _remote = SocketUtil.EndConnectTcp(ar);
+                _remote.EndConnect(ar);
+
+                _remote.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, true);
 
                 byte[] handshake = {5, 1, 0};
                 _remote.BeginSend(handshake, 0, handshake.Length, 0, Socks5HandshakeSendCallback, state);

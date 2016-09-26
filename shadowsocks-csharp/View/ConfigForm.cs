@@ -42,6 +42,7 @@ namespace Shadowsocks.View
         {
             AddButton.Text = I18N.GetString("&Add");
             DeleteButton.Text = I18N.GetString("&Delete");
+            DuplicateButton.Text = I18N.GetString("Dupli&cate");
             IPLabel.Text = I18N.GetString("Server Addr");
             ServerPortLabel.Text = I18N.GetString("Server Port");
             PasswordLabel.Text = I18N.GetString("Password");
@@ -219,6 +220,20 @@ namespace Shadowsocks.View
             _modifiedConfiguration.configs.Add(server);
             LoadConfiguration(_modifiedConfiguration);
             ServersListBox.SelectedIndex = _modifiedConfiguration.configs.Count - 1;
+            _lastSelectedIndex = ServersListBox.SelectedIndex;
+        }
+
+        private void DuplicateButton_Click( object sender, EventArgs e )
+        {
+            if (!SaveOldSelectedServer())
+            {
+                return;
+            }
+            Server currServer = _modifiedConfiguration.configs[_lastSelectedIndex];
+            var currIndex = _modifiedConfiguration.configs.IndexOf( currServer );
+            _modifiedConfiguration.configs.Insert(currIndex + 1, currServer);
+            LoadConfiguration(_modifiedConfiguration);
+            ServersListBox.SelectedIndex = currIndex + 1;
             _lastSelectedIndex = ServersListBox.SelectedIndex;
         }
 
