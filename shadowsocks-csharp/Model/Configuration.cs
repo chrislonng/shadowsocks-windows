@@ -26,9 +26,8 @@ namespace Shadowsocks.Model
         public bool autoCheckUpdate;
         public bool isVerboseLogging;
         public LogViewerConfig logViewer;
-        public bool useProxy;
-        public string proxyServer;
-        public int proxyPort;
+        public ProxyConfig proxy;
+        public HotkeyConfig hotkey;
 
         private static string CONFIG_FILE = "gui-config.json";
 
@@ -58,6 +57,17 @@ namespace Shadowsocks.Model
                     config.localPort = 1080;
                 if (config.index == -1 && config.strategy == null)
                     config.index = 0;
+                if (config.logViewer == null)
+                    config.logViewer = new LogViewerConfig();
+                if (config.proxy == null)
+                    config.proxy = new ProxyConfig();
+                if (config.hotkey == null)
+                    config.hotkey = new HotkeyConfig();
+
+                if (config.proxy.proxyType < ProxyConfig.PROXY_SOCKS5 || config.proxy.proxyType > ProxyConfig.PROXY_HTTP)
+                {
+                    config.proxy.proxyType = ProxyConfig.PROXY_SOCKS5;
+                }
                 return config;
             }
             catch (Exception e)
@@ -98,7 +108,7 @@ namespace Shadowsocks.Model
             }
             catch (IOException e)
             {
-                Console.Error.WriteLine(e);
+                Logging.LogUsefulException(e);
             }
         }
 
