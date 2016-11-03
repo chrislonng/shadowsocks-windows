@@ -1,3 +1,18 @@
+3.3.4 2016-10-21
+- Fix IE dial-up and VPN connection proxy settings
+  not changed since release 3.3.3.
+- Fix a UI bug
+
+3.3.3 2016-10-10
+- Add timeout support for server and forward proxy,
+  only integer is allowed
+- Use wininet API to setup system proxy
+- Upgrade to .NET Framework 4.6.2
+
+3.3.2 2016-10-03
+- Add HTTP forward proxy support
+- Bug fixes and improvements
+
 3.3.1 2016-09-20
 - Add global hotkey support
 - Bug fixes and improvements

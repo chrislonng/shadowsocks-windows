@@ -49,6 +49,7 @@ namespace Shadowsocks.View
             EncryptionLabel.Text = I18N.GetString("Encryption");
             ProxyPortLabel.Text = I18N.GetString("Proxy Port");
             RemarksLabel.Text = I18N.GetString("Remarks");
+            TimeoutLabel.Text = I18N.GetString("Timeout(Sec)");
             OneTimeAuth.Text = I18N.GetString("Onetime Authentication");
             ServerGroupBox.Text = I18N.GetString("Server");
             OKButton.Text = I18N.GetString("OK");
@@ -82,18 +83,36 @@ namespace Shadowsocks.View
                 {
                     return true;
                 }
-                Server server = new Server
+                Server server = new Server();
+                server.server = IPTextBox.Text.Trim();
+                try
                 {
-                    server = IPTextBox.Text.Trim(),
-                    server_port = int.Parse(ServerPortTextBox.Text),
-                    password = PasswordTextBox.Text,
-                    method = EncryptionSelect.Text,
-                    remarks = RemarksTextBox.Text,
-                    auth = OneTimeAuth.Checked,
-                    enable_kcp = EnableKCPCheckBox.Checked,
-                    kcp_remote_addr = KCPRemoteAddrTextbox.Text,
-                    kcp_cli_params = KCPParamsTextBox.Text
-                };
+                    server.server_port = int.Parse(ServerPortTextBox.Text);
+                }
+                catch (FormatException)
+                {
+                    MessageBox.Show(I18N.GetString("Illegal port number format"));
+                    ServerPortTextBox.Clear();
+                    return false;
+                }
+                server.password = PasswordTextBox.Text;
+                server.method = EncryptionSelect.Text;
+                server.remarks = RemarksTextBox.Text;
+				server.auth = OneTimeAuth.Checked;
+				server.enable_kcp = EnableKCPCheckBox.Checked;
+				server.kcp_remote_addr = KCPRemoteAddrTextbox.Text;
+				server.kcp_cli_params = KCPParamsTextBox.Text;
+                try
+                {
+                    server.timeout = int.Parse(TimeoutTextBox.Text);
+                }
+                catch (FormatException)
+                {
+                    MessageBox.Show(I18N.GetString("Illegal timeout format"));
+                    TimeoutTextBox.Clear();
+                    return false;
+                }
+                server.auth = OneTimeAuth.Checked;
                 int localPort = int.Parse(ProxyPortTextBox.Text);
                 Configuration.CheckServer(server);
                 Configuration.CheckLocalPort(localPort);
@@ -125,6 +144,7 @@ namespace Shadowsocks.View
                 ProxyPortTextBox.Text = _modifiedConfiguration.localPort.ToString();
                 EncryptionSelect.Text = server.method ?? "aes-256-cfb";
                 RemarksTextBox.Text = server.remarks;
+                TimeoutTextBox.Text = server.timeout.ToString();
                 OneTimeAuth.Checked = server.auth;
                 EnableKCPCheckBox.Checked = server.enable_kcp;
                 KCPRemoteAddrTextbox.Text = server.kcp_remote_addr;
@@ -293,7 +313,7 @@ namespace Shadowsocks.View
         {
             int index = ServersListBox.SelectedIndex;
             Server server = _modifiedConfiguration.configs[index];
-            object item = ServersListBox.SelectedItem;
+            object item = ServersListBox.Items[index];
 
             _modifiedConfiguration.configs.Remove(server);
             _modifiedConfiguration.configs.Insert(index + step, server);

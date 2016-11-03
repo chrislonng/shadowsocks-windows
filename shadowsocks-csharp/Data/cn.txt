@@ -47,6 +47,7 @@ Password=密码
 Encryption=加密
 Proxy Port=代理端口
 Remarks=备注
+Timeout(Sec)=超时(秒)
 Onetime Authentication=一次性认证
 OK=确定
 Cancel=取消
@@ -58,7 +59,6 @@ Enable KCP=启用KCP协议
 Using KCP if checked=打勾使用KCP协议
 KCP Server(HOST:PORT)=KCP服务器地址
 KCP Command Parameters=KCP命令行参数
-
 # Proxy Form
 
 Edit Proxy=代理设置
@@ -108,6 +108,7 @@ Reg All=注册全部热键
 Shadowsocks Error: {0}=Shadowsocks 错误: {0}
 Port already in use=端口已被占用
 Illegal port number format=非法端口格式
+Illegal timeout format=非法超时格式
 Please add at least one server=请添加至少一个服务器
 Server IP can not be blank=服务器 IP 不能为空
 Password can not be blank=密码不能为空
@@ -137,3 +138,4 @@ Proxy request failed=代理请求失败
 Proxy handshake failed=代理握手失败
 Register hotkey failed=注册热键失败
 Cannot parse hotkey: {0}=解析热键失败: {0}
+Timeout is invalid, it should not exceed {0}=超时无效，不应超过 {0}

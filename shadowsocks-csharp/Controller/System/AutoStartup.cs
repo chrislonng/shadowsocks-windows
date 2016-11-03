@@ -15,7 +15,7 @@ namespace Shadowsocks.Controller
             try
             {
                 string path = Application.ExecutablePath;
-                runKey = Utils.OpenUserRegKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
+                runKey = Utils.OpenRegKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
                 if ( runKey == null ) {
                     Logging.Error( @"Cannot find HKCU\Software\Microsoft\Windows\CurrentVersion\Run" );
                     return false;
@@ -39,8 +39,10 @@ namespace Shadowsocks.Controller
             {
                 if (runKey != null)
                 {
-                    try { runKey.Close(); }
-                    catch (Exception e)
+                    try {
+                        runKey.Close();
+                        runKey.Dispose();
+                    } catch (Exception e)
                     { Logging.LogUsefulException(e); }
                 }
             }
@@ -52,7 +54,7 @@ namespace Shadowsocks.Controller
             try
             {
                 string path = Application.ExecutablePath;
-                runKey = Utils.OpenUserRegKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
+                runKey = Utils.OpenRegKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
                 if (runKey == null) {
                     Logging.Error(@"Cannot find HKCU\Software\Microsoft\Windows\CurrentVersion\Run");
                     return false;
@@ -84,8 +86,10 @@ namespace Shadowsocks.Controller
             {
                 if (runKey != null)
                 {
-                    try { runKey.Close(); }
-                    catch (Exception e)
+                    try {
+                        runKey.Close();
+                        runKey.Dispose();
+                    } catch (Exception e)
                     { Logging.LogUsefulException(e); }
                 }
             }
