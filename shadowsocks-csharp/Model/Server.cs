@@ -15,12 +15,16 @@ namespace Shadowsocks.Model
             DetailsParser = new Regex("^((?<method>.+?)(?<auth>-auth)??:(?<password>.*)@(?<hostname>.+?)" +
                                       ":(?<port>\\d+?))$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
+        private const int DefaultServerTimeoutSec = 5;
+        public const int MaxServerTimeoutSec = 20;
+
         public string server;
         public int server_port;
         public string password;
         public string method;
         public string remarks;
         public bool auth;
+        public int timeout;
 
         //kcp
         public bool enable_kcp;
@@ -72,6 +76,7 @@ namespace Shadowsocks.Model
             password = "";
             remarks = "";
             auth = false;
+            timeout = DefaultServerTimeoutSec;
         }
 
         public Server(string ssURL) : this()

@@ -70,7 +70,7 @@ namespace Shadowsocks.Encryption
                 realkey = _key;
             }
             MbedTLS.cipher_init(ctx);
-            if (MbedTLS.cipher_setup( ctx, MbedTLS.cipher_info_from_string( _cipherMbedName ) ) != 0 )
+            if (MbedTLS.cipher_setup( ctx, MbedTLS.cipher_info_from_string( _innerLibName ) ) != 0 )
                 throw new Exception("Cannot initialize mbed TLS cipher context");
             /*
              * MbedTLS takes key length by bit
@@ -105,7 +105,11 @@ namespace Shadowsocks.Encryption
         }
 
         #region IDisposable
+
         private bool _disposed;
+
+        // instance based lock
+        private readonly object _lock = new object();
 
         public override void Dispose()
         {
@@ -120,31 +124,32 @@ namespace Shadowsocks.Encryption
 
         protected virtual void Dispose(bool disposing)
         {
-            lock (this)
+            lock (_lock)
             {
-                if (_disposed)
-                {
-                    return;
-                }
+                if (_disposed) return;
                 _disposed = true;
             }
 
             if (disposing)
             {
-                if (_encryptCtx != IntPtr.Zero)
-                {
-                    MbedTLS.cipher_free(_encryptCtx);
-                    Marshal.FreeHGlobal(_encryptCtx);
-                    _encryptCtx = IntPtr.Zero;
-                }
-                if (_decryptCtx != IntPtr.Zero)
-                {
-                    MbedTLS.cipher_free(_decryptCtx);
-                    Marshal.FreeHGlobal(_decryptCtx);
-                    _decryptCtx = IntPtr.Zero;
-                }
+                // free managed objects
+            }
+
+            // free unmanaged objects
+            if (_encryptCtx != IntPtr.Zero)
+            {
+                MbedTLS.cipher_free(_encryptCtx);
+                Marshal.FreeHGlobal(_encryptCtx);
+                _encryptCtx = IntPtr.Zero;
+            }
+            if (_decryptCtx != IntPtr.Zero)
+            {
+                MbedTLS.cipher_free(_decryptCtx);
+                Marshal.FreeHGlobal(_decryptCtx);
+                _decryptCtx = IntPtr.Zero;
             }
         }
+
         #endregion
     }
 }
