@@ -101,6 +101,7 @@ namespace Shadowsocks.View
 				server.auth = OneTimeAuth.Checked;
 				server.enable_kcp = EnableKCPCheckBox.Checked;
 				server.kcp_remote_addr = KCPRemoteAddrTextbox.Text;
+				server.kcp_cli_params = KCPParamsTextBox.Text;
                 try
                 {
                     server.timeout = int.Parse(TimeoutTextBox.Text);
